@@ -17,9 +17,11 @@ $LOAD_PATH << "../lib"
 
 require 'rubygems'
 require 'net/irc'
-require 'nokogiri'
+#require 'nokogiri'
 require 'open-uri'
 require 'pp'
+require 'mechanize'
+require 'xmlsimple'
 
 class ScBot < Net::IRC::Client
 
@@ -45,14 +47,16 @@ class ScBot < Net::IRC::Client
   attr_accessor :st_np
   attr_accessor :st_lstnrs
   
-  def set_sc_servers(sc_server, sc_port)
+  def set_sc_servers(sc_server, sc_port, sc_password)
     @sc_server = sc_server
     @sc_port = sc_port
+		@sc_password = sc_password
+		@agent.add_auth("http://#{@sc_server}:#{@sc_port}/admin.cgi?mode=viewxml", "admin", @sc_password)
   end
   
   def set_ircdetails(c_admin, c_main, c_idle, t_on, t_off, t_admin, h_msg,
                      h_admin, stream, st_online, st_offline, now_playing,
-                     listeners)
+										 listeners)
     @chan_admin = c_admin
     @chan_main = c_main
     @chans_idle = c_idle
@@ -64,12 +68,16 @@ class ScBot < Net::IRC::Client
     @cmd_stream = stream
     @st_online = st_online
     @st_offline = st_offline
-    @st_np = now_playing
-    @st_lstnrs = listeners
+		@st_np = now_playing
+		@st_lstnrs = listeners
+		@xml = nil
   end
 
   def initialize(*args)
     super
+
+		@agent = Mechanize.new
+		@agent.user_agent_alias = 'Linux Firefox'
   end
   
   def on_ping(m)
@@ -100,11 +108,11 @@ class ScBot < Net::IRC::Client
   def auto_update_topic
     sleep 2
     while true
-      @title_old = @title
-      @status_old = @status
+      @title_old = @xml["SERVERTITLE"].first
+      @status_old = @xml["STREAMSTATUS"].first.to_i
       sleep 60
       update_sc_status
-      if @title_old != @title || @status_old != @status
+      if @title_old != @xml["SERVERTITLE"].first || @status_old != @xml["STREAMSTATUS"].first.to_i
         update_topic(false)
       end
     end
@@ -114,9 +122,9 @@ class ScBot < Net::IRC::Client
     if udpate
       update_sc_status
     end
-    if @status == '1'
-      post TOPIC, @chan_main, @st_online + ': ' + @title.to_s + @topic_on.to_s
-      post TOPIC, @chan_admin, @st_online + ': ' + @title.to_s + @topic_admin.to_s
+    if @xml["STREAMSTATUS"].first.to_i == 1
+      post TOPIC, @chan_main, @st_online + ': ' + @xml["SERVERTITLE"].first + @topic_on.to_s
+      post TOPIC, @chan_admin, @st_online + ': ' + @xml["SERVERTITLE"].first + @topic_admin.to_s
     else
       post TOPIC, @chan_main, @st_offline + @topic_off.to_s
       post TOPIC, @chan_admin, @st_offline + @topic_admin.to_s
@@ -134,7 +142,11 @@ class ScBot < Net::IRC::Client
       end
     elsif m[1] == '.np'
       update_sc_status
-      post PRIVMSG, m[0], @cmd_prr
+			if @xml["STREAMSTATUS"].first.to_i == 1
+	      post PRIVMSG, m[0], "#{@st_np}: #{@xml["SONGTITLE"].first} (#{@xml["SERVERTITLE"].first}: #{@xml["CURRENTLISTENERS"].first} #{@st_lstnrs})"
+			else
+				post PRIVMSG, m[0], @st_offline
+			end
     elsif m[1] == '.stream'
       post PRIVMSG, m[0], @cmd_stream
     elsif m[1] == '.status'
@@ -150,42 +162,7 @@ class ScBot < Net::IRC::Client
   end
 
   def update_sc_status
-    frst = ''
-    fdoc = Nokogiri::HTML(open('http://' + @sc_server.to_s + ':' + @sc_port.to_s + '/7.html', "User-Agent" => "Linux Mozilla Firefox"))
-    fdoc.search('body').each do |body|
-      frst = body.content
-    end
-    fcurrentlisteners, fstreamstatus, fpeaklisteners, fmaxlisteners, funiquelisteners, fbitrate, *fsongtitle = frst.to_s.split(/,/)
-    current = fcurrentlisteners.to_i
-    if current < 1
-      current = 0
-    end
-    max = fmaxlisteners.to_i
-    peak = fpeaklisteners.to_i
-    fstatus = 'offline'
-    title = ''
-    status = ''
-    if fstreamstatus == '1'
-      fstatus = 'online'
-      tdoc = Nokogiri::HTML(open('http://' + @sc_server.to_s + ':' + @sc_port.to_s + '/index.html', "User-Agent" => "Linux Mozilla Firefox"))
-      i = 0
-      tdoc.css('body table tr td font b').each do |b|
-      if i == 5
-        title = b
-      end
-      i = i + 1
-      end
-      null, *tmp = title.to_s.split('b>')
-      title, *null  = tmp.to_s.split('</b')
-      prr = @st_np + ': ' + fsongtitle.to_s + ' (' + title.to_s + ': ' + current.to_s + ' ' + @st_lstnrs + ').'
-    else
-      fstatus = 'offline'
-      prr = @st_offline
-      title = 'none'
-    end
-    @title = title
-    @status = fstreamstatus
-    @cmd_prr = prr
-    @cmd_status = 'Title: ' + @title.to_s + ', Status: ' + fstatus + ', Track: ' + fsongtitle.to_s + ', Current: ' + current.to_s + '/' + max.to_s + ', Peak: ' + peak.to_s + '/' + max.to_s + ', Bitrate: ' + fbitrate.to_s + ' kbit/s'
+		page = @agent.get("http://#{@sc_server.to_s}:#{@sc_port.to_s}/admin.cgi?mode=viewxml")
+		@xml = XmlSimple.xml_in(page.body)
   end
 end
