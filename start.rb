@@ -12,7 +12,7 @@
 #                                                         #
 ###########################################################
 
-$LOAD_PATH << "lib"
+$LOAD_PATH << "./lib"
 $LOAD_PATH << "../lib"
 
 require 'rubygems'
@@ -21,6 +21,7 @@ load 'inc/scbot.rb'
 ### SHOUTCAST-v1 SETTINGS #################################
 sc_server = '123.456.789.0'    # shoutcast server adress
 sc_port = '8000'               # shoutcast server port
+sc_password = ''
 ###########################################################
 
 ### IRC SERVER SETTINGS ###################################
@@ -71,7 +72,7 @@ bot = ScBot.new(server, port, { :pass => password,
                                 :nick => nick,
                                 :user => user_name,
                                 :real => real_name, } )
-bot.set_sc_servers(sc_server, sc_port)
+bot.set_sc_servers(sc_server, sc_port, sc_password)
 bot.set_ircdetails(admin_chan, main_chan, idle_chans, online_topic,
                    offline_topic, admin_topic, help_msg, help_admin, stream,
                    st_online, st_offline, now_playing, listeners)
