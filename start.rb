@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/usr/bin/env ruby
 
 ###########################################################
 #                                                         #
@@ -16,7 +16,7 @@ $LOAD_PATH << "lib"
 $LOAD_PATH << "../lib"
 
 require 'rubygems'
-require 'inc/scbot.rb'
+load 'inc/scbot.rb'
 
 ### SHOUTCAST-v1 SETTINGS #################################
 sc_server = '123.456.789.0'    # shoutcast server adress
