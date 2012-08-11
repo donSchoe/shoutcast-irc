@@ -56,12 +56,13 @@ dependencies
 ------------
 
 `shoutcast-irc` is a `ruby` script depending on `rubygems`. install at least
-`ruby-1.8` and `rubygems-1.8`.
+`ruby-1.9.2` and `rubygems-1.9`.
 
 the following gems are required:
 
- * `net-irc-0.0.9`
- * `nokogiri-1.5.5`
+ * `net-irc-0.0.9` or better
+ * `xml-simple-1.1.0` or better
+ * `mechanize-2.3.0` or better
 
 
 setup and running
@@ -98,6 +99,12 @@ if you need support post an issue on github or send me a mail.
 changelog
 ---------
 
+0.2.2: (2012-08-11)
+ * using /usr/bin/env to get rubies outside the usual path and load instead
+   of require so it looks in the right place for includes
+ * switching to mechanize and utilizing the xml interface for server
+   information
+
 0.2.1: (2012-08-11)
  * fixed stream title string parser
  
@@ -131,4 +138,5 @@ changelog
 contributors
 ------------
 
- * alexander schoedon, donc_oe@qhor.net
+ * donSchoe, donc_oe@qhor.net
+ * v2px, v2px@v2px.de

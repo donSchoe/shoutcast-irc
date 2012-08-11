@@ -21,15 +21,20 @@ load 'inc/scbot.rb'
 ### SHOUTCAST-v1 SETTINGS #################################
 sc_server = '123.456.789.0'    # shoutcast server adress
 sc_port = '8000'               # shoutcast server port
-sc_password = ''
+sc_password = ''               # shoutcast admin password
 ###########################################################
 
 ### IRC SERVER SETTINGS ###################################
-server = 'irc.example.net'     # irc server address
+server = 'chat.freenode.net'     # irc server address
 port = '6667'                  # irc server port
-nick = 'botnick'               # nickname of the bot
-password = 'botpass'           # password of the bot (required, see README)
-user_name = 'botuser'          # username of the bot
+nick = 'donschoe'               # nickname of the bot
+password = 'papa110'           # password of the bot (required, see README)
+user_name = 'donschoe'          # username of the bot
+#server = 'irc.example.net'     # irc server address
+#port = '6667'                  # irc server port
+#nick = 'botnick'               # nickname of the bot
+#password = 'botpass'           # password of the bot (required, see README)
+#user_name = 'botuser'          # username of the bot
 real_name = 'Ingo the Bot'     # realname of the bot
 # the admin channel is the control center of the bot.
 # channel should be mode +Rsi. make sure the bot gets auto-op on join.

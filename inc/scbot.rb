@@ -17,7 +17,6 @@ $LOAD_PATH << "../lib"
 
 require 'rubygems'
 require 'net/irc'
-#require 'nokogiri'
 require 'open-uri'
 require 'pp'
 require 'mechanize'
@@ -46,6 +45,7 @@ class ScBot < Net::IRC::Client
   attr_accessor :st_offline
   attr_accessor :st_np
   attr_accessor :st_lstnrs
+  attr_accessor :xml
   
   def set_sc_servers(sc_server, sc_port, sc_password)
     @sc_server = sc_server
