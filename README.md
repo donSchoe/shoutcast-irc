@@ -3,7 +3,7 @@ shoutcast-irc
 
 a simple but nice shoutcast-to-irc announcer bot.
 
-copyleft (c) 2012 alexander schoedon <donc_oe@qhor.net>
+copyleft (c) 2012 alexander schoedon, donc_oe@qhor.net
 
 
 functionality
@@ -13,11 +13,11 @@ the bot is able to:
 
  * connect to an irc network and join channels
  * read statusinformation of a shoutcast server (**shoutcast v1 only!**)
-> * stream title 
-> * server status (online/offline)
-> * song artist and title
-> * current, peak and max listeners
-> * bitrate
+    * stream title 
+    * server status (online/offline)
+    * song artist and title
+    * current, peak and max listeners
+    * bitrate
  * announce stream, song and server status to irc channels on request
  * change topic of channels automatically on server status change
 
@@ -98,34 +98,37 @@ if you need support post an issue on github or send me a mail.
 changelog
 ---------
 
-0.2.0-dev: (2012-08-10)
-> * first public version, hf
+0.2.1: (2012-08-11)
+ * fixed stream title string parser
+ 
+0.2.0: (2012-08-10)
+ * first public version, hf
 
 0.1.0-dev: (2012-08-09)
-> * complete code clean-up
-> * class `ScBot` re-written (and moved to `inc/scbot.rb`)
-> * configuration via `start.rb` possible
+ * complete code clean-up
+ * class `ScBot` re-written (and moved to `inc/scbot.rb`)
+ * configuration via `start.rb` possible
 
 0.0.5-dev: (2012-08-09)
-> * fixed typo
+ * fixed typo
 
 0.0.4-dev: (2012-08-09)
-> * topic now being changed automatically
-> * improved variables
+ * topic now being changed automatically
+ * improved variables
 
 0.0.3-dev: (2012-08-09)
-> * added stream-title-parser
-> * added topic-changer
-> * improved status messages
+ * added stream-title-parser
+ * added topic-changer
+ * improved status messages
 
 0.0.2-dev: (2012-08-09)
-> * fixed calculation of current listeners
+ * fixed calculation of current listeners
 
 0.0.1-dev: (2012-08-06)
-> * initial commit of the basic script
+ * initial commit of the basic script
 
 
 contributors
 ------------
 
-> * alexander schoedon <donc_oe@qhor.net>
+ * alexander schoedon, donc_oe@qhor.net

@@ -175,8 +175,8 @@ class ScBot < Net::IRC::Client
       end
       i = i + 1
       end
-      null, *tmp = title.to_s.split('.de ')
-      title, *null  = tmp.to_s.split('</')
+      null, *tmp = title.to_s.split('b>')
+      title, *null  = tmp.to_s.split('</b')
       prr = @st_np + ': ' + fsongtitle.to_s + ' (' + title.to_s + ': ' + current.to_s + ' ' + @st_lstnrs + ').'
     else
       fstatus = 'offline'
