@@ -56,7 +56,7 @@ dependencies
 ------------
 
 `shoutcast-irc` is a `ruby` script depending on `rubygems`. install at least
-`ruby-1.9.2` and `rubygems-1.9`.
+`ruby-1.9.3` and `rubygems-1.8.24`.
 
 the following gems are required:
 

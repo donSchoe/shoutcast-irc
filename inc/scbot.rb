@@ -105,7 +105,7 @@ class ScBot < Net::IRC::Client
     post PRIVMSG, @chan_main, @help_msg
   end
 
-  def auto_update_topic
+  def auto_update_topic ### @todo doesnt work anymore!
     sleep 2
     while true
       @title_old = @xml["SERVERTITLE"].first
@@ -152,7 +152,7 @@ class ScBot < Net::IRC::Client
     elsif m[1] == '.status'
       if m[0] == @chan_admin
         update_sc_status
-        post PRIVMSG, @chan_admin, @cmd_status
+        post PRIVMSG, @chan_admin, @cmd_status ### @todo this is empty!
       end
     elsif m[1] == '.topic'
       if m[0] == @chan_admin
