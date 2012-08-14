@@ -87,7 +87,13 @@ class ScBot < Net::IRC::Client
   def on_rpl_welcome(m)
     join_channels
     post_welcome
-    t=Thread.new{auto_update_topic}
+		Thread.new do
+			update_sc_status
+			update_topic
+			loop do
+				auto_update_topic
+			end
+		end
   end
 
   def join_channels
@@ -100,25 +106,21 @@ class ScBot < Net::IRC::Client
   end
 
   def post_welcome
-    sleep 2
     post PRIVMSG, @chan_admin, @help_admin
     post PRIVMSG, @chan_main, @help_msg
   end
 
   def auto_update_topic ### @todo doesnt work anymore!
-    sleep 2
-    while true
-      @title_old = @xml["SERVERTITLE"].first
-      @status_old = @xml["STREAMSTATUS"].first.to_i
-      sleep 60
-      update_sc_status
-      if @title_old != @xml["SERVERTITLE"].first || @status_old != @xml["STREAMSTATUS"].first.to_i
-        update_topic(false)
-      end
+    @title_old = @xml["SERVERTITLE"].first
+    @status_old = @xml["STREAMSTATUS"].first.to_i
+    sleep 60
+    update_sc_status
+    if @title_old != @xml["SERVERTITLE"].first || @status_old != @xml["STREAMSTATUS"].first.to_i
+      update_topic(false)
     end
   end
 
-  def update_topic(update)
+  def update_topic(update=false)
     if udpate
       update_sc_status
     end
