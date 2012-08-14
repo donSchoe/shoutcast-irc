@@ -2,7 +2,7 @@
 
 ###########################################################
 #                                                         #
-#                SHOUTCAST-IRC v0.2.0-dev                 #
+#                  SHOUTCAST-IRC v0.2.3                   #
 #                                                         #
 ###########################################################
 #                                                         #
@@ -34,29 +34,27 @@ class ScBot < Net::IRC::Client
   attr_accessor :topic_admin
   attr_accessor :help_msg
   attr_accessor :help_admin
-  attr_accessor :title
   attr_accessor :title_old
   attr_accessor :status
   attr_accessor :status_old
-  attr_accessor :cmd_prr
-  attr_accessor :cmd_status
   attr_accessor :cmd_stream
   attr_accessor :st_online
   attr_accessor :st_offline
   attr_accessor :st_np
   attr_accessor :st_lstnrs
+  attr_accessor :agent
   attr_accessor :xml
   
   def set_sc_servers(sc_server, sc_port, sc_password)
     @sc_server = sc_server
     @sc_port = sc_port
-		@sc_password = sc_password
-		@agent.add_auth("http://#{@sc_server}:#{@sc_port}/admin.cgi?mode=viewxml", "admin", @sc_password)
+    @sc_password = sc_password
+    @agent.add_auth("http://#{@sc_server}:#{@sc_port}/admin.cgi?mode=viewxml", "admin", @sc_password)
   end
   
   def set_ircdetails(c_admin, c_main, c_idle, t_on, t_off, t_admin, h_msg,
                      h_admin, stream, st_online, st_offline, now_playing,
-										 listeners)
+                     listeners)
     @chan_admin = c_admin
     @chan_main = c_main
     @chans_idle = c_idle
@@ -68,16 +66,15 @@ class ScBot < Net::IRC::Client
     @cmd_stream = stream
     @st_online = st_online
     @st_offline = st_offline
-		@st_np = now_playing
-		@st_lstnrs = listeners
-		@xml = nil
+    @st_np = now_playing
+    @st_lstnrs = listeners
+    @xml = nil
   end
 
   def initialize(*args)
     super
-
-		@agent = Mechanize.new
-		@agent.user_agent_alias = 'Linux Firefox'
+    @agent = Mechanize.new
+    @agent.user_agent_alias = 'Linux Firefox'
   end
   
   def on_ping(m)
@@ -87,13 +84,13 @@ class ScBot < Net::IRC::Client
   def on_rpl_welcome(m)
     join_channels
     post_welcome
-		Thread.new do
-			update_sc_status
-			update_topic
-			loop do
-				auto_update_topic
-			end
-		end
+    Thread.new do
+      update_sc_status
+      update_topic
+      loop do
+        auto_update_topic
+      end
+    end
   end
 
   def join_channels
@@ -110,7 +107,7 @@ class ScBot < Net::IRC::Client
     post PRIVMSG, @chan_main, @help_msg
   end
 
-  def auto_update_topic ### @todo doesnt work anymore!
+  def auto_update_topic
     @title_old = @xml["SERVERTITLE"].first
     @status_old = @xml["STREAMSTATUS"].first.to_i
     sleep 60
@@ -144,17 +141,21 @@ class ScBot < Net::IRC::Client
       end
     elsif m[1] == '.np'
       update_sc_status
-			if @xml["STREAMSTATUS"].first.to_i == 1
-	      post PRIVMSG, m[0], "#{@st_np}: #{@xml["SONGTITLE"].first} (#{@xml["SERVERTITLE"].first}: #{@xml["CURRENTLISTENERS"].first} #{@st_lstnrs})"
-			else
-				post PRIVMSG, m[0], @st_offline
-			end
+      if @xml["STREAMSTATUS"].first.to_i == 1
+        post PRIVMSG, m[0], "#{@st_np}: #{@xml["SONGTITLE"].first} (#{@xml["SERVERTITLE"].first}: #{@xml["CURRENTLISTENERS"].first} #{@st_lstnrs})"
+      else
+        post PRIVMSG, m[0], @st_offline
+      end
     elsif m[1] == '.stream'
       post PRIVMSG, m[0], @cmd_stream
     elsif m[1] == '.status'
       if m[0] == @chan_admin
         update_sc_status
-        post PRIVMSG, @chan_admin, @cmd_status ### @todo this is empty!
+        @status = 'offline'
+        if @xml["STREAMSTATUS"].first.to_i == 1
+          @status = 'online'
+        end
+        post PRIVMSG, @chan_admin, "Title: #{@xml["SERVERTITLE"].first}, Status: #{status}, Track: #{@xml["SONGTITLE"].first}, Current: #{@xml["CURRENTLISTENERS"].first}/#{@xml["MAXLISTENERS"].first}, Peak: #{@xml["PEAKLISTENERS"].first}/#{@xml["MAXLISTENERS"].first}, Bitrate: #{@xml["BITRATE"].first} kbit/s"
       end
     elsif m[1] == '.topic'
       if m[0] == @chan_admin
@@ -164,7 +165,7 @@ class ScBot < Net::IRC::Client
   end
 
   def update_sc_status
-		page = @agent.get("http://#{@sc_server.to_s}:#{@sc_port.to_s}/admin.cgi?mode=viewxml")
-		@xml = XmlSimple.xml_in(page.body)
+    page = @agent.get("http://#{@sc_server.to_s}:#{@sc_port.to_s}/admin.cgi?mode=viewxml")
+    @xml = XmlSimple.xml_in(page.body)
   end
 end

@@ -99,6 +99,10 @@ if you need support post an issue on github or send me a mail.
 changelog
 ---------
 
+0.2.3: (2012-08-15)
+ * fixing the .status bug introduced in e41ab74
+ * fixing the topic-autoupdate bug introduced in e41ab74
+
 0.2.2: (2012-08-11)
  * using /usr/bin/env to get rubies outside the usual path and load instead
    of require so it looks in the right place for includes
